@@ -56,32 +56,35 @@ def worker(num, orderings):
 
 
 worker_count = 16
+if __name__ == '__main__':
+    print('Creating permutations...', flush=True)
+    start = time()
+    orderings = list(permutations(criticals))
+    print('Created list of permutations:', time() - start, 'seconds', flush=True)
 
-print('Creating permutations...', flush=True)
-start = time()
-orderings = list(permutations(criticals))
-print('Created list of permutations:', time() - start, 'seconds', flush=True)
+    chunk_size = len(orderings) // worker_count
 
-chunk_size = len(orderings) // worker_count
+    print("Dividing workload...", flush=True)
+    orderings_divided = []
+    for i in range(worker_count):
+        if i != worker_count - 1:
+            orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
+        else:
+            orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
+        with open(f"orderings{i}.p", 'wb') as f:
+            pickle.dump(orderings_divided[i], f)
+        print(f"Workload {i} ready", flush=True)
 
-print("Dividing workload...", flush=True)
-orderings_divided = []
-for i in range(worker_count):
-    if i != worker_count - 1:
-        orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
-    else:
-        orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
-    print(f"Workload {i} ready", flush=True)
+    input("Proceed with process assignment?")
+    print("Assigning processes...", flush=True)
+    start = time()
+    processes = []
+    for i in range(worker_count):
+        p = Process(target=worker, args=(i, orderings_divided[i]))
+        p.start()
+        processes.append(p)
 
-print("Assigning processes...", flush=True)
-start = time()
-processes = []
-for i in range(worker_count):
-    p = Process(target=worker, args=(i, orderings_divided[i]))
-    p.start()
-    processes.append(p)
+    for process in processes:
+        process.join()
 
-for process in processes:
-    process.join()
-
-print(f'-ALL PROCESSES FINISHED in {time() - start} seconds-', flush=True)
+    print(f'-ALL PROCESSES FINISHED in {time() - start} seconds-', flush=True)
