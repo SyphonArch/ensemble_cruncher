@@ -18,13 +18,16 @@ for team in teams:
 criticals = set()
 
 for member in member_to_idxs:
-    # print(member, member_to_idxs[member])
+    print(member, member_to_idxs[member])
     if len(member_to_idxs[member]) > 1:
         for idx in member_to_idxs[member]:
             criticals.add(idx)
 
+input("Press Enter to proceed")
 
-def evaluate(ordering, verbose=False):
+
+def evaluate(ordering, verbose=False, return_individual_waits=False):
+    individual_waits = []
     wait = 0
     for member in member_to_idxs:
         individual_wait = 0
@@ -34,7 +37,11 @@ def evaluate(ordering, verbose=False):
         if verbose:
             print(f'\t{member} waits {individual_wait}')
         wait += individual_wait
-    return wait
+        individual_waits.append(individual_wait)
+    if return_individual_waits:
+        return wait, individual_waits
+    else:
+        return wait
 
 
 def worker(num, orderings):
@@ -49,7 +56,7 @@ def worker(num, orderings):
             best_orders = [ordering]
         elif value == best:
             best_orders.append(ordering)
-        if i % 1000000:
+        if i % 100000 == 0:
             print(f"[worker {num}]: {i + 1} / {len(orderings)}", flush=True)
     with open(f"worker#{num}.p", 'wb') as f:
         pickle.dump([best, best_orders], f)
