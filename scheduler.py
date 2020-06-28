@@ -55,6 +55,14 @@ def worker(num, orderings):
     print(f"[worker {num}] FINISHED in {time() - start} seconds", flush=True)
 
 
+def divider(num):
+    if num != worker_count - 1:
+        orderings_divided.append(orderings[num * chunk_size: (num + 1) * chunk_size])
+    else:
+        orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
+    print(f"Workload {num} ready", flush=True)
+
+
 worker_count = 16
 
 print('Creating permutations...', flush=True)
@@ -66,12 +74,14 @@ chunk_size = len(orderings) // worker_count
 
 print("Dividing workload...", flush=True)
 orderings_divided = []
-for i in range(worker_count - 1):
-    orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
-    print(f"Workload {i} ready", flush=True)
-orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
-print(f"Workload {worker_count - 1} ready", flush=True)
+dividers = []
+for i in range(worker_count):
+    p = Process(target=divider, args=(i,))
+    p.start()
+    dividers.append(p)
 
+for divider in dividers:
+    divider.join()
 
 print("Assigning processes...", flush=True)
 start = time()
@@ -81,7 +91,7 @@ for i in range(worker_count):
     p.start()
     processes.append(p)
 
-for i in range(worker_count):
-    processes[i].join()
+for process in processes:
+    process.join()
 
 print(f'-ALL PROCESSES FINISHED in {time() - start} seconds-', flush=True)
