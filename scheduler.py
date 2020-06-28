@@ -1,6 +1,7 @@
+"""This is where I attempted to do the work."""
 from data import teams
 from itertools import permutations
-from multiprocessing import Process, Manager
+from multiprocessing import Process
 import pickle
 from time import time
 
