@@ -23,8 +23,6 @@ for member in member_to_idxs:
         for idx in member_to_idxs[member]:
             criticals.add(idx)
 
-input("Press Enter to proceed")
-
 
 def evaluate(ordering, verbose=False, return_individual_waits=False):
     individual_waits = []
