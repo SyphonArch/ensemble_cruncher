@@ -60,16 +60,18 @@ worker_count = 16
 print('Creating permutations...', flush=True)
 start = time()
 orderings = list(permutations(criticals))
-print('Created list of permutations:', time() - start, flush=True)
+print('Created list of permutations:', time() - start, 'seconds', flush=True)
 
 chunk_size = len(orderings) // worker_count
 
+print("Dividing workload...", flush=True)
 orderings_divided = []
-
 for i in range(worker_count - 1):
     orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
 orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
 
+
+print("Assigning processes...", flush=True)
 start = time()
 processes = []
 for i in range(worker_count):
