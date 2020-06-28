@@ -1,5 +1,7 @@
 from data import teams
 from itertools import permutations
+from multiprocessing import Process
+import pickle
 from time import time
 
 idx_to_name = {}
@@ -34,20 +36,48 @@ def evaluate(ordering, verbose=False):
     return wait
 
 
+def worker(num, orderings):
+    print(f"[worker {num}] INITIATE", flush=True)
+    start = time()
+    best = float('inf')
+    best_orders = []
+    for i, ordering in enumerate(orderings):
+        value = evaluate(ordering)
+        if value < best:
+            best = value
+            best_orders = [ordering]
+        elif value == best:
+            best_orders.append(ordering)
+        if i % 1000000:
+            print(f"[worker {num}]: {i + 1} / {len(orderings)}", flush=True)
+    with open(f"worker#{num}.p", 'wb') as f:
+        pickle.dump([best, best_orders], f)
+    print(f"[worker {num}] FINISHED in {time() - start} seconds", flush=True)
+
+
+worker_count = 16
+
+print('Creating permutations...', flush=True)
 start = time()
 orderings = list(permutations(criticals))
-print('tolist', time() - start)
+print('Created list of permutations:', time() - start, flush=True)
+
+chunk_size = len(orderings) // worker_count
+
+orderings_divided = []
+
+for i in range(worker_count - 1):
+    orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
+orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
+
 start = time()
-best = float('inf')
-best_order = None
-for i, ordering in enumerate(orderings):
-    value = evaluate(ordering)
-    if value < best:
-        best = value
-        best_order = ordering
-    if i == 1000000:
-        break
-print('time', time() - start)
-print(best)
-print(best_order)
-evaluate(best_order, True)
+processes = []
+for i in range(worker_count):
+    p = Process(target=worker, args=(i, orderings_divided[i]))
+    p.start()
+    processes.append(p)
+
+for i in range(worker_count):
+    processes[i].join()
+
+print(f'-ALL PROCESSES FINISHED in {time() - start} seconds-', flush=True)
