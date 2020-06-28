@@ -68,9 +68,9 @@ print("Dividing workload...", flush=True)
 orderings_divided = []
 for i in range(worker_count - 1):
     orderings_divided.append(orderings[i * chunk_size: (i + 1) * chunk_size])
-    print(f"Workload {i} ready")
+    print(f"Workload {i} ready", flush=True)
 orderings_divided.append(orderings[(worker_count - 1) * chunk_size:])
-print(f"Workload {worker_count - 1} ready")
+print(f"Workload {worker_count - 1} ready", flush=True)
 
 
 print("Assigning processes...", flush=True)
