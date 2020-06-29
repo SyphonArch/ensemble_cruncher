@@ -24,8 +24,11 @@ for i, team in enumerate(teams):
     recording_end = str(team.recording_end.time())[:-3]
     print()
     print(f"순번 {i + 1}: {team.name}")
-    print(f"\t\t[리허설 시작: {rehearsal_start} | 녹화 시작: {recording_start} | 녹화 종료: {recording_end}]")
+    print(f"\t[리허설 시작: {rehearsal_start} | 녹화 시작: {recording_start} | 녹화 종료: {recording_end}]")
 
+total_people = [0] * 13
+
+print("연주자별 참여시간")
 for member in sorted(member_to_idxs.keys()):
     relevant_teams = []
     indexes = []
@@ -39,3 +42,11 @@ for member in sorted(member_to_idxs.keys()):
     print()
     print(f"{member}: 참여곡 {indexes}")
     print(f"\t첫 곡 리허설 시작: {start_time} | 마지막 곡 녹화 종료: {end_time}")
+
+    for i in range(indexes[0], indexes[-1] + 1):
+        if i - 1 not in indexes:
+            total_people[i - 1] += 1
+
+print()
+print('시간대별 대기인원수 추정')
+print(total_people)
