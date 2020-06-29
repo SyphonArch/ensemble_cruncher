@@ -1,12 +1,13 @@
 """This is where I attempted to do the work."""
-from data import teams
+from schedule_cruncher.data import teams
 from itertools import permutations
 from multiprocessing import Process
 import pickle
-from time import time
+from time import time as tm
 
 idx_to_name = {}
 member_to_idxs = {}
+runtime_map = {1: 13, 2: 10, 3: 8, 4: 12, 5: 10, 6: 4, 7: 6, 8: 8, 9: 14, 10: 7, 11: 10, 12: 4, 13: 13}
 
 for team in teams:
     idx_to_name[team.idx] = team.name
@@ -18,7 +19,7 @@ for team in teams:
 criticals = set()
 
 for member in member_to_idxs:
-    print(member, member_to_idxs[member])
+    # print(member, member_to_idxs[member])
     if len(member_to_idxs[member]) > 1:
         for idx in member_to_idxs[member]:
             criticals.add(idx)
@@ -44,7 +45,7 @@ def evaluate(ordering, verbose=False, return_individual_waits=False):
 
 def worker(num, orderings):
     print(f"[worker {num}] INITIATE", flush=True)
-    start = time()
+    start = tm()
     best = float('inf')
     best_orders = []
     for i, ordering in enumerate(orderings):
@@ -58,15 +59,15 @@ def worker(num, orderings):
             print(f"[worker {num}]: {i + 1} / {len(orderings)}", flush=True)
     with open(f"worker#{num}.p", 'wb') as f:
         pickle.dump([best, best_orders], f)
-    print(f"[worker {num}] FINISHED in {time() - start} seconds", flush=True)
+    print(f"[worker {num}] FINISHED in {tm() - start} seconds", flush=True)
 
 
 worker_count = 16
 if __name__ == '__main__':
     print('Creating permutations...', flush=True)
-    start = time()
+    start = tm()
     orderings = list(permutations(criticals))
-    print('Created list of permutations:', time() - start, 'seconds', flush=True)
+    print('Created list of permutations:', tm() - start, 'seconds', flush=True)
 
     chunk_size = len(orderings) // worker_count
 
@@ -83,7 +84,7 @@ if __name__ == '__main__':
 
     input("Proceed with process assignment?")
     print("Assigning processes...", flush=True)
-    start = time()
+    start = tm()
     processes = []
     for i in range(worker_count):
         p = Process(target=worker, args=(i, orderings_divided[i]))
@@ -93,4 +94,4 @@ if __name__ == '__main__':
     for process in processes:
         process.join()
 
-    print(f'-ALL PROCESSES FINISHED in {time() - start} seconds-', flush=True)
+    print(f'-ALL PROCESSES FINISHED in {tm() - start} seconds-', flush=True)

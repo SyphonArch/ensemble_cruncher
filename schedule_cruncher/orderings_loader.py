@@ -1,5 +1,5 @@
 """This is where I ended up doing the work"""
-from scheduler import *
+from schedule_cruncher.scheduler import *
 from sys import argv
 
 num = int(argv[1])

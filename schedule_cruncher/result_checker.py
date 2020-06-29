@@ -1,10 +1,10 @@
 import pickle
-import scheduler
+from schedule_cruncher import scheduler
 
 data = []
 
 for i in range(16):
-    filename = f"worker#{i}.p"
+    filename = f"schedule_cruncher/worker#{i}.p"
     with open(filename, 'rb') as f:
         rslt = pickle.load(f)
         data.append(rslt)
@@ -27,7 +27,6 @@ for score in scores:
     if score[1] == 19:
         finals.append(score[0])
 
-runtime_map = {1: 13, 2: 10, 3: 8, 4: 12, 5: 10, 6: 4, 7: 6, 8: 8, 9: 14, 10: 7, 11: 10, 12: 4, 13: 13}
 member_to_idxs = scheduler.member_to_idxs
 
 
@@ -44,7 +43,7 @@ def total_wait_minutes(ordering, verbose=False):
                 buffer = 0
             else:
                 if arrived:
-                    buffer += runtime_map[idx]
+                    buffer += scheduler.runtime_map[idx]
         total_wait += member_wait
         if verbose:
             print(f"{member} waits {member_wait} minutes")
@@ -53,6 +52,26 @@ def total_wait_minutes(ordering, verbose=False):
 
 finals.sort(key=total_wait_minutes)
 
+final_finals = []
 for ordering in finals:
     if total_wait_minutes(ordering) == 81:
-        print(ordering)
+        final_finals.append(ordering)
+
+answer = final_finals[-1]
+
+answer += (5,)
+# print(answer)
+
+prefix = [0]
+for idx in answer:
+    prefix.append(prefix[-1] + scheduler.runtime_map[idx])
+
+# print(prefix[1:])
+
+if __name__ == '__main__':
+    print('\n앙상블 프로그램 순서')
+    for i, idx in enumerate(answer):
+        print(i, '\t', scheduler.idx_to_name[idx])
+
+    print()
+    total_wait_minutes(answer, True)
