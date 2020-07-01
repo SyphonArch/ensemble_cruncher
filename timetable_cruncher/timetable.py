@@ -2,7 +2,7 @@ from schedule_cruncher.scheduler import *
 from schedule_cruncher.result_checker import answer
 from datetime import datetime, timedelta
 
-answer = (4, 6, 11, 1, 2, 10, 13, 8, 3, 9, 7, 12, 5)
+answer = (6, 4, 11, 1, 2, 10, 13, 8, 3, 9, 7, 12, 5)
 
 teams.sort(key=lambda team: answer.index(team.idx))
 
