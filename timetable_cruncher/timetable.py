@@ -2,6 +2,8 @@ from schedule_cruncher.scheduler import *
 from schedule_cruncher.result_checker import answer
 from datetime import datetime, timedelta
 
+answer = (4, 6, 11, 1, 2, 10, 13, 8, 3, 9, 7, 12, 5)
+
 teams.sort(key=lambda team: answer.index(team.idx))
 
 two_minutes = timedelta(minutes=2)
@@ -25,9 +27,11 @@ for i, team in enumerate(teams):
     print()
     print(f"순번 {i + 1}: {team.name}")
     print(f"\t[리허설 시작: {rehearsal_start} | 녹화 시작: {recording_start} | 녹화 종료: {recording_end}]")
+    print('\t' + ', '.join(team.members) + '')
 
 total_people = [0] * 13
 
+print()
 print("연주자별 참여시간")
 for member in sorted(member_to_idxs.keys()):
     relevant_teams = []
