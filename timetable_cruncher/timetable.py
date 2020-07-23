@@ -9,7 +9,7 @@ teams.sort(key=lambda team: answer.index(team.idx))
 two_minutes = timedelta(minutes=2)
 quarter = timedelta(minutes=15)
 
-teams[0].set_time(datetime(2020, 7, 9, hour=13, minute=30))
+teams[0].set_time(datetime(2020, 7, 9, hour=13, minute=45))
 for i in range(1, len(teams)):
     team = teams[i]
     if i == 6:
